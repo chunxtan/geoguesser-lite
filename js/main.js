@@ -12,7 +12,9 @@ let cities = [];
  /*----- cached elements  -----*/
 const welcomeMsg = document.getElementById('welcome-msg');
 const cityContainer = document.getElementById('city-container');
+const startBtn = document.getElementById('start-btn');
 const confirmBtn = document.getElementById('confirm-btn');
+const nextBtn = document.getElementById('next-btn');
 const gameStatsContainer = document.getElementById('game-stats-container'); 
 
 const cityCounter = document.getElementById('city-counter');
@@ -21,11 +23,11 @@ const guessNum = document.querySelectorAll('.guessNum');
 const guessDist = document.querySelectorAll('.guessDist');
 
  /*----- event listeners -----*/
-confirmBtn.addEventListener('click', startGame);
+startBtn.addEventListener('click', startGame);
+confirmBtn.addEventListener('click', checkGuess);
+nextBtn.addEventListener('click', newRound);
 
  /*----- functions -----*/
-
-
 function startGame() {
     initialise();
 }
@@ -33,26 +35,26 @@ function startGame() {
 function initialise() {
     state = {
         score: 0,
-        citiesPlayed: 0,
-        cityGuesses: [{
-            "1": null,
-            "2": null,
-            "3": null
-        }],
-        currGuess: null
+        cityNum: 0,
+        numOfGuesses: 0,
+        currGuessLatLng: null
     }
     getCities();
     renderStart();
+    renderGame();
 }
 
 // to render initial state of game UI
 function renderStart() {
     // render UI components
-    welcomeMsg.style.display = "none";
+    const elToHide = [welcomeMsg, startBtn];
+    elToHide.forEach(el => {
+        el.style.display = "none";
+    })
 
     confirmBtn.innerHTML = "Confirm Guess";
 
-    const elToInitialise = [cityContainer, gameStatsContainer];
+    const elToInitialise = [cityContainer, gameStatsContainer, confirmBtn];
     elToInitialise.forEach(el => {
         el.style.display = "block";
     })
@@ -73,21 +75,27 @@ function renderStart() {
     map.on("click", handleClick);
 }
 
+// to render UI for each new round
+function renderGame() {
+    cityCounter.innerHTML = `City ${state.cityNum + 1} of 5:`;
+    cityName.innerHTML = cities[state.cityNum].city.toUpperCase();
+}
+
 // to handle user's click on map
 function handleClick(evt) {
     // get click latlng
     const latlng = evt.latlng;
     
     // check if marker exists before rendering new marker
-    if (state.currGuess) {
+    if (state.currGuessLatLng) {
         map.removeLayer(guessMarker);
         guessMarker = new L.Marker(latlng);
         map.addLayer(guessMarker);
-        state.currGuess = latlng;
+        state.currGuessLatLng = latlng;
     } else {
         guessMarker = new L.Marker(latlng);
         map.addLayer(guessMarker);
-        state.currGuess = latlng;
+        state.currGuessLatLng = latlng;
     }
 }
 
@@ -101,17 +109,49 @@ function getCities() {
             uniqueIdx.push(randIdx);
         }
     }
-    console.log(uniqueIdx);
 
     uniqueIdx.forEach(idx => {
-        cities.push(worldCities[idx].city.toUpperCase());
+        cities.push(worldCities[idx]);
+    })
+
+    cities.forEach(city => {
+        city.latlng = [city.lat, city.lng];
     })
 }
 
-function checkGuess() {
+function checkGuess(evt) {
     // to check how far player's guess is from answer
+    const dist = (map.distance(state.currGuessLatLng, cities[state.cityNum].latlng))/1000;
     // if guess is within Xkm,
-        // show win message & render point + line on leaflet map
+    if (dist < 50) {
+        console.log("You guessed it!");
+        const ansMarker = new L.Marker(cities[state.cityNum].latlng).addTo(map);
+        const polyline = L.polyline([state.currGuessLatLng, cities[state.cityNum].latlng], { color: "green"}).addTo(map);
+        map.fitBounds(polyline.getBounds());
+    } else {
+        guessNum[state.numOfGuesses].innerHTML = state.numOfGuesses+1;
+        guessDist[state.numOfGuesses].innerHTML = `${dist.toFixed(2)} km`;
+    }
+
+    state.numOfGuesses += 1;
+
+    // TO-DO: score calculation
+    if (state.numOfGuesses === 3) {
+        console.log("You didn't guess it...");
+        // TO-DO: make into function
+        const ansMarker = new L.Marker(cities[state.cityNum].latlng).addTo(map);
+        const polyline = L.polyline([state.currGuessLatLng, cities[state.cityNum].latlng], { color: "green"}).addTo(map);
+        map.fitBounds(polyline.getBounds());
+
+        confirmBtn.style.display = "none";
+        nextBtn.style.display = "block";
+    }
+}
+
+function newRound() {
+    // TO-DO: reset states
+
+    // TO-DO: reset game UI for next round
 }
 
 

@@ -60,7 +60,7 @@ header {
     margin: auto;
 }
 
-#confirm-btn {
+.multi-btn {
     width: 15%;
     height: 2rem;
     margin: auto;
@@ -71,10 +71,18 @@ header {
     color: #376942;
 }
 
-#confirm-btn:hover {
+.multi-btn:hover {
     background-color: #376942;
     color: white;
     cursor: pointer;
+}
+
+#confirm-btn {
+    display: none;
+}
+
+#next-btn {
+    display: none;
 }
 
 #game-stats-container {
@@ -92,10 +100,13 @@ header {
 
 .guess {
     padding: 5px;
-    background-color: lightgrey;
-    border-radius: 15px;
+    background-color: lightgrey;    
     text-align: center;
+    vertical-align: middle;
+    border-radius: 15px;
+    align-content: center;
     margin: 3px;
+    height: 1.3rem;
 }
 
 .guessTitle {
