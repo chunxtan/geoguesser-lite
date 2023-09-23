@@ -5,6 +5,7 @@ const winDist = 50;
 let state;
 
  /*----- cached elements  -----*/
+const welcomeMsg = document.getElementById('welcome-msg');
 const cityContainer = document.getElementById('city-container');
 const confirmBtn = document.getElementById('confirm-btn');
 const gameStatsContainer = document.getElementById('game-stats-container'); 
@@ -38,6 +39,8 @@ function initialise() {
 
 // to render initial state of game UI
 function renderStart() {
+    welcomeMsg.style.display = "none";
+
     confirmBtn.innerHTML = "Confirm Guess";
 
     const elToInitialise = [cityContainer, gameStatsContainer];
