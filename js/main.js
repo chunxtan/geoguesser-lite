@@ -1,3 +1,5 @@
+import { worldCities } from "./worldcities.js";
+
 /*----- constants -----*/
 const winDist = 50;
 
@@ -5,6 +7,7 @@ const winDist = 50;
 let state;
 let map;
 let guessMarker;
+let cities = [];
 
  /*----- cached elements  -----*/
 const welcomeMsg = document.getElementById('welcome-msg');
@@ -12,6 +15,8 @@ const cityContainer = document.getElementById('city-container');
 const confirmBtn = document.getElementById('confirm-btn');
 const gameStatsContainer = document.getElementById('game-stats-container'); 
 
+const cityCounter = document.getElementById('city-counter');
+const cityName = document.getElementById('city-name');
 const guessNum = document.querySelectorAll('.guessNum');
 const guessDist = document.querySelectorAll('.guessDist');
 
@@ -28,8 +33,7 @@ function startGame() {
 function initialise() {
     state = {
         score: 0,
-        cityCounter: 1,
-        citiesPlayed: [],
+        citiesPlayed: 0,
         cityGuesses: [{
             "1": null,
             "2": null,
@@ -37,7 +41,7 @@ function initialise() {
         }],
         currGuess: null
     }
-
+    getCities();
     renderStart();
 }
 
@@ -87,9 +91,21 @@ function handleClick(evt) {
     }
 }
 
-function getCity() {
-    // to retrieve random city from list
-    // check if city in citiesPlayed
+// to prepare list of cities for game
+function getCities() {
+    let uniqueIdx = [];
+
+    while (uniqueIdx.length < 5) {
+        const randIdx = Math.floor(Math.random() * worldCities.length);
+        if (!uniqueIdx.includes(randIdx)) {
+            uniqueIdx.push(randIdx);
+        }
+    }
+    console.log(uniqueIdx);
+
+    uniqueIdx.forEach(idx => {
+        cities.push(worldCities[idx].city.toUpperCase());
+    })
 }
 
 function checkGuess() {
