@@ -1,4 +1,4 @@
- /*----- constants -----*/
+/*----- constants -----*/
 const winDist = 50;
 
  /*----- state variables -----*/
@@ -47,6 +47,17 @@ function renderStart() {
     elToInitialise.forEach(el => {
         el.style.display = "block";
     })
+
+    let map = L.map('map', {
+        center: [0, 0],
+        zoomSnap: 0.25,
+        zoom: 0.5,
+        minZoom: 1
+    });
+
+    L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}.jpg', {
+        attribution: '&copy; <a href="https://stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://stamen.com/" target="_blank">Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/about" target="_blank">OpenStreetMap</a> contributors', 
+    }).addTo(map);
 }
 
 function getCity() {
