@@ -1,0 +1,108 @@
+body {
+    font-family: 'Work Sans', sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-color: #EEF2F5;
+}
+
+header {
+    font-size: 50px;
+    text-decoration: underline;
+    text-align: center;
+    padding: 10px;
+}
+
+#city-container {
+    display: none;
+}
+
+#city-counter {
+    font-size: 15px;
+    text-align: center;
+    margin-top: 20px;
+}
+
+#city-name {
+    font-size: 50px;
+    font-weight: bold;
+    text-align: center;
+}
+
+#map {
+    width: 50%;
+    height: 20rem;
+    margin: auto;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    background-color: beige;
+}
+
+#next-btn {
+    width: 7%;
+    background-color: #A4D497;
+    border-radius: 70%;
+    margin: auto;
+    display: flex;  
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+#next-btn > img {
+    scale: 40%;
+    margin: auto;
+}
+
+#confirm-btn {
+    width: 15%;
+    height: 2rem;
+    margin: auto;
+    border: none;
+    font-family: 'Work Sans', sans-serif;
+    font-weight: bold;
+    background-color: #A4D497;
+    color: #376942;
+}
+
+#confirm-btn:hover {
+    background-color: #376942;
+    color: white;
+    cursor: pointer;
+}
+
+#game-stats-container {
+    display: none;
+}
+
+#guess-container {
+    width: 50%;
+    display: grid;
+    grid-template-rows: 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 3fr;
+    margin: auto;
+    margin-top: 30px;
+}
+
+.guess {
+    padding: 5px;
+    background-color: lightgrey;
+    border-radius: 15px;
+    text-align: center;
+    margin: 3px;
+}
+
+.guessTitle {
+    text-align: center;
+    font-weight: bold;
+    align-content: center;
+}
+
+#score {
+    font-size: 15px;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 20px;
+}
+
+
