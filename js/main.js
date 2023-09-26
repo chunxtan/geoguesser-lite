@@ -1,7 +1,10 @@
 import { worldCities } from "./worldcities.js";
 
 /*----- constants -----*/
-const winDist = 50;
+const winDist = 100;
+const minDist = 3000;
+const numOfGuesses = 3;
+const numOfRounds = 5;
 
  /*----- state variables -----*/
 let state;
@@ -85,7 +88,7 @@ function renderGame() {
     map.setView([0, 0], 0.5);
     map.on("click", handleClick);
 
-    cityCounter.innerHTML = `City ${state.cityNum + 1} of 5:`;
+    cityCounter.innerHTML = `City ${state.cityNum + 1} of ${numOfRounds}:`;
     cityName.innerHTML = cities[state.cityNum].city.toUpperCase();
     distAns.innerHTML = null;
     nextBtn.style.display = "none";
@@ -96,7 +99,6 @@ function renderGame() {
 
 // to handle user's click on map
 function handleClick(evt) {
-
         // get click latlng
         const latlng = evt.latlng;
         
@@ -117,7 +119,7 @@ function handleClick(evt) {
 function getCities() {
     let uniqueIdx = [];
 
-    while (uniqueIdx.length < 5) {
+    while (uniqueIdx.length < numOfRounds) {
         const randIdx = Math.floor(Math.random() * worldCities.length);
         if (!uniqueIdx.includes(randIdx)) {
             uniqueIdx.push(randIdx);
@@ -134,15 +136,16 @@ function getCities() {
 }
 
 function checkGuess() {
-
     // check if user added marker to map
     if (guessMarker && map.hasLayer(guessMarker)) {
         // to check how far player's guess is from answer
         const dist = (map.distance(state.currGuessLatLng, cities[state.cityNum].latlng))/1000;
         // if guess is within Xkm,
-        if (dist < 100) {
-            console.log("You guessed it!");
+        if (dist <= winDist) {
+            distAns.innerHTML = `You guessed it! You were only ${dist.toFixed(2)} km away!`
             showAns();
+
+            calcScore(dist);
 
         } else {
             guessNum[state.numOfGuesses].innerHTML = state.numOfGuesses+1;
@@ -152,13 +155,13 @@ function checkGuess() {
         state.numOfGuesses += 1;
 
         // render guess result UI
-        if (state.numOfGuesses === 3) {
+        if (state.numOfGuesses === numOfGuesses) {
             distAns.innerHTML = `You were ${dist.toFixed(2)} km away!`
             showAns();
 
             // only guesses within 3000km can accumulate a score
-            if (dist <= 3000) {
-                state.score += Math.floor(0.75**((dist/100)-11.75)*100);
+            if (dist <= minDist) {
+                calcScore(dist);
 
                 score.innerHTML = `Total Score: ${state.score}`
             }
@@ -173,6 +176,11 @@ function checkGuess() {
             guessWarning.innerHTML = null;
         }, 3000)
     }
+}
+
+// to compute score within minDist
+function calcScore(dist) {
+    state.score += Math.floor(0.75**((dist/100)-11.75)*100);
 }
 
 // to zoom into answer + guess bounds
