@@ -24,19 +24,16 @@ const cityName = document.getElementById('city-name');
 const guessNum = document.querySelectorAll('.guessNum');
 const guessDist = document.querySelectorAll('.guessDist');
 
+const guessWarning = document.getElementById('guess-warning');
 const distAns = document.getElementById('dist-ans');
 const score = document.getElementById('score');
 
  /*----- event listeners -----*/
-startBtn.addEventListener('click', startGame);
+startBtn.addEventListener('click', initialise);
 confirmBtn.addEventListener('click', checkGuess);
 nextBtn.addEventListener('click', newRound);
 
  /*----- functions -----*/
-function startGame() {
-    initialise();
-}
-
 function initialise() {
     state = {
         score: 0,
@@ -99,20 +96,21 @@ function renderGame() {
 
 // to handle user's click on map
 function handleClick(evt) {
-    // get click latlng
-    const latlng = evt.latlng;
-    
-    // check if marker exists before rendering new marker
-    if (state.currGuessLatLng) {
-        map.removeLayer(guessMarker);
-        guessMarker = new L.Marker(latlng);
-        map.addLayer(guessMarker);
-        state.currGuessLatLng = latlng;
-    } else {
-        guessMarker = new L.Marker(latlng);
-        map.addLayer(guessMarker);
-        state.currGuessLatLng = latlng;
-    }
+
+        // get click latlng
+        const latlng = evt.latlng;
+        
+        // check if marker exists before rendering new marker
+        if (state.currGuessLatLng) {
+            map.removeLayer(guessMarker);
+            guessMarker = new L.Marker(latlng);
+            map.addLayer(guessMarker);
+            state.currGuessLatLng = latlng;
+        } else {
+            guessMarker = new L.Marker(latlng);
+            map.addLayer(guessMarker);
+            state.currGuessLatLng = latlng;
+        }
 }
 
 // to prepare list of cities for game
@@ -136,34 +134,44 @@ function getCities() {
 }
 
 function checkGuess() {
-    // to check how far player's guess is from answer
-    const dist = (map.distance(state.currGuessLatLng, cities[state.cityNum].latlng))/1000;
-    // if guess is within Xkm,
-    if (dist < 100) {
-        console.log("You guessed it!");
-        showAns();
 
-    } else {
-        guessNum[state.numOfGuesses].innerHTML = state.numOfGuesses+1;
-        guessDist[state.numOfGuesses].innerHTML = `${dist.toFixed(2)} km`;
-    }
+    // check if user added marker to map
+    if (guessMarker && map.hasLayer(guessMarker)) {
+        // to check how far player's guess is from answer
+        const dist = (map.distance(state.currGuessLatLng, cities[state.cityNum].latlng))/1000;
+        // if guess is within Xkm,
+        if (dist < 100) {
+            console.log("You guessed it!");
+            showAns();
 
-    state.numOfGuesses += 1;
-
-    // render guess result UI
-    if (state.numOfGuesses === 3) {
-        distAns.innerHTML = `You were ${dist.toFixed(2)} km away!`
-        showAns();
-
-        // only guesses within 3000km can accumulate a score
-        if (dist <= 3000) {
-            state.score += Math.floor(0.75**((dist/100)-11.75)*100);
-
-            score.innerHTML = `Total Score: ${state.score}`
+        } else {
+            guessNum[state.numOfGuesses].innerHTML = state.numOfGuesses+1;
+            guessDist[state.numOfGuesses].innerHTML = `${dist.toFixed(2)} km`;
         }
 
-        confirmBtn.style.display = "none";
-        nextBtn.style.display = "block";
+        state.numOfGuesses += 1;
+
+        // render guess result UI
+        if (state.numOfGuesses === 3) {
+            distAns.innerHTML = `You were ${dist.toFixed(2)} km away!`
+            showAns();
+
+            // only guesses within 3000km can accumulate a score
+            if (dist <= 3000) {
+                state.score += Math.floor(0.75**((dist/100)-11.75)*100);
+
+                score.innerHTML = `Total Score: ${state.score}`
+            }
+
+            confirmBtn.style.display = "none";
+            nextBtn.style.display = "block";
+        }
+    } else {
+        // if user clicks confirm guess without making a guess
+        guessWarning.innerHTML = "Please make a guess first!";
+        setTimeout(() => {
+            guessWarning.innerHTML = null;
+        }, 3000)
     }
 }
 

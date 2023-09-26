@@ -85,6 +85,11 @@ header {
     display: none;
 }
 
+#guess-warning {
+    text-align: center;
+    color: #CC6250
+}
+
 #dist-ans {
     text-align: center;
     margin-bottom: 5px;
