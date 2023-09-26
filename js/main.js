@@ -7,6 +7,8 @@ const winDist = 50;
 let state;
 let map;
 let guessMarker;
+let ansMarker;
+let polyline;
 let cities = [];
 
  /*----- cached elements  -----*/
@@ -41,7 +43,6 @@ function initialise() {
     }
     getCities();
     renderStart();
-    renderGame();
 }
 
 // to render initial state of game UI
@@ -73,12 +74,23 @@ function renderStart() {
 
     map.setMaxBounds(map.getBounds());
     map.on("click", handleClick);
+
+    cityCounter.innerHTML = `City ${state.cityNum + 1} of 5:`;
+    cityName.innerHTML = cities[state.cityNum].city.toUpperCase();
 }
 
 // to render UI for each new round
 function renderGame() {
+    // reset map zoom
+    map.setView([0, 0], 0.5);
+    map.on("click", handleClick);
+
     cityCounter.innerHTML = `City ${state.cityNum + 1} of 5:`;
     cityName.innerHTML = cities[state.cityNum].city.toUpperCase();
+    nextBtn.style.display = "none";
+    confirmBtn.style.display = "block";
+    guessNum.forEach(el => el.innerHTML = null);
+    guessDist.forEach(el => el.innerHTML = null);
 }
 
 // to handle user's click on map
@@ -119,15 +131,14 @@ function getCities() {
     })
 }
 
-function checkGuess(evt) {
+function checkGuess() {
     // to check how far player's guess is from answer
     const dist = (map.distance(state.currGuessLatLng, cities[state.cityNum].latlng))/1000;
     // if guess is within Xkm,
-    if (dist < 50) {
+    if (dist < 100) {
         console.log("You guessed it!");
-        const ansMarker = new L.Marker(cities[state.cityNum].latlng).addTo(map);
-        const polyline = L.polyline([state.currGuessLatLng, cities[state.cityNum].latlng], { color: "green"}).addTo(map);
-        map.fitBounds(polyline.getBounds());
+        showAns();
+
     } else {
         guessNum[state.numOfGuesses].innerHTML = state.numOfGuesses+1;
         guessDist[state.numOfGuesses].innerHTML = `${dist.toFixed(2)} km`;
@@ -136,22 +147,38 @@ function checkGuess(evt) {
     state.numOfGuesses += 1;
 
     // TO-DO: score calculation
+    // TO:DO: render guess result UI
     if (state.numOfGuesses === 3) {
-        console.log("You didn't guess it...");
-        // TO-DO: make into function
-        const ansMarker = new L.Marker(cities[state.cityNum].latlng).addTo(map);
-        const polyline = L.polyline([state.currGuessLatLng, cities[state.cityNum].latlng], { color: "green"}).addTo(map);
-        map.fitBounds(polyline.getBounds());
+        console.log(`You were ${dist}km away!`);
+        showAns();
 
         confirmBtn.style.display = "none";
         nextBtn.style.display = "block";
     }
 }
 
-function newRound() {
-    // TO-DO: reset states
+// to zoom into answer + guess bounds
+function showAns() {
+    // TO-DO: style ansMarker to diff style
+    ansMarker = new L.Marker(cities[state.cityNum].latlng).addTo(map);
+    polyline = L.polyline([state.currGuessLatLng, cities[state.cityNum].latlng], { color: "green"}).addTo(map);
+    map.fitBounds(polyline.getBounds().pad(0.2));
+}
 
-    // TO-DO: reset game UI for next round
+// to set up next round
+function newRound() {
+    // remove all graphics from map
+    map.removeLayer(guessMarker);
+    map.removeLayer(ansMarker);
+    map.removeLayer(polyline);
+
+    // reset states
+    state.cityNum += 1;
+    state.numOfGuesses = 0;
+    state.currGuessLatLng = null;
+
+    // reset game UI
+    renderGame();
 }
 
 
