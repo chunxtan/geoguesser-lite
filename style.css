@@ -36,7 +36,7 @@ header {
 }
 
 #map {
-    width: 65%;
+    width: 700px;
     height: 27rem;
     margin: auto;
     margin-top: 10px;
@@ -83,6 +83,11 @@ header {
 
 #next-btn {
     display: none;
+}
+
+#dist-ans {
+    text-align: center;
+    margin-bottom: 5px;
 }
 
 #game-stats-container {

@@ -24,6 +24,9 @@ const cityName = document.getElementById('city-name');
 const guessNum = document.querySelectorAll('.guessNum');
 const guessDist = document.querySelectorAll('.guessDist');
 
+const distAns = document.getElementById('dist-ans');
+const score = document.getElementById('score');
+
  /*----- event listeners -----*/
 startBtn.addEventListener('click', startGame);
 confirmBtn.addEventListener('click', checkGuess);
@@ -87,6 +90,7 @@ function renderGame() {
 
     cityCounter.innerHTML = `City ${state.cityNum + 1} of 5:`;
     cityName.innerHTML = cities[state.cityNum].city.toUpperCase();
+    distAns.innerHTML = null;
     nextBtn.style.display = "none";
     confirmBtn.style.display = "block";
     guessNum.forEach(el => el.innerHTML = null);
@@ -146,11 +150,17 @@ function checkGuess() {
 
     state.numOfGuesses += 1;
 
-    // TO-DO: score calculation
-    // TO:DO: render guess result UI
+    // render guess result UI
     if (state.numOfGuesses === 3) {
-        console.log(`You were ${dist}km away!`);
+        distAns.innerHTML = `You were ${dist.toFixed(2)} km away!`
         showAns();
+
+        // only guesses within 3000km can accumulate a score
+        if (dist <= 3000) {
+            state.score += Math.floor(0.75**((dist/100)-11.75)*100);
+
+            score.innerHTML = `Total Score: ${state.score}`
+        }
 
         confirmBtn.style.display = "none";
         nextBtn.style.display = "block";
