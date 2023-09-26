@@ -41,7 +41,7 @@ function initialise() {
     state = {
         score: 0,
         cityNum: 0,
-        numOfGuesses: 0,
+        distGuesses: [],
         currGuessLatLng: null
     }
     getCities();
@@ -140,28 +140,35 @@ function checkGuess() {
     if (guessMarker && map.hasLayer(guessMarker)) {
         // to check how far player's guess is from answer
         const dist = (map.distance(state.currGuessLatLng, cities[state.cityNum].latlng))/1000;
-        // if guess is within Xkm,
+        state.distGuesses.push({
+            guessNum: state.distGuesses.length,
+            latlng: state.currGuessLatLng,
+            distance: dist
+        });
+        const currGuesses = state.distGuesses.length;
+
+        // if guess is within winDist,
         if (dist <= winDist) {
             distAns.innerHTML = `You guessed it! You were only ${dist.toFixed(2)} km away!`
-            showAns();
+            showAns(true, null);
 
             calcScore(dist);
-
         } else {
-            guessNum[state.numOfGuesses].innerHTML = state.numOfGuesses+1;
-            guessDist[state.numOfGuesses].innerHTML = `${dist.toFixed(2)} km`;
+            guessNum[currGuesses - 1].innerHTML = currGuesses;
+            guessDist[currGuesses - 1].innerHTML = `${dist.toFixed(2)} km`;
         }
 
-        state.numOfGuesses += 1;
-
-        // render guess result UI
-        if (state.numOfGuesses === numOfGuesses) {
-            distAns.innerHTML = `You were ${dist.toFixed(2)} km away!`
-            showAns();
+        // if all guesses have been used up before a correct guess
+        // render result UI
+        if (currGuesses === numOfGuesses) {
+            const shortestDistGuess = state.distGuesses.sort((a, b) => (a.distance-b.distance))[0];
+            const shortestDist = shortestDistGuess.distance;
+            distAns.innerHTML = `Your closest guess was ${shortestDist.toFixed(2)} km away!`
+            showAns(false, shortestDistGuess);
 
             // only guesses within 3000km can accumulate a score
-            if (dist <= minDist) {
-                calcScore(dist);
+            if (shortestDist <= minDist) {
+                calcScore(shortestDist);
 
                 score.innerHTML = `Total Score: ${state.score}`
             }
@@ -169,6 +176,8 @@ function checkGuess() {
             confirmBtn.style.display = "none";
             nextBtn.style.display = "block";
         }
+
+        // TO-DO: if the user has completed all rounds
     } else {
         // if user clicks confirm guess without making a guess
         guessWarning.innerHTML = "Please make a guess first!";
@@ -184,10 +193,21 @@ function calcScore(dist) {
 }
 
 // to zoom into answer + guess bounds
-function showAns() {
+function showAns(isGuessCorrect, shortestDistGuess) {
     // TO-DO: style ansMarker to diff style
     ansMarker = new L.Marker(cities[state.cityNum].latlng).addTo(map);
-    polyline = L.polyline([state.currGuessLatLng, cities[state.cityNum].latlng], { color: "green"}).addTo(map);
+
+    // if user did not manage to guess the city location
+    if (!isGuessCorrect) {
+        // render marker of guess with the shortest distance
+        map.removeLayer(guessMarker);
+        guessMarker = new L.Marker(shortestDistGuess.latlng);
+        map.addLayer(guessMarker);
+        polyline = L.polyline([shortestDistGuess.latlng, cities[state.cityNum].latlng], { color: "green" }).addTo(map);
+    } else {
+        polyline = L.polyline([state.currGuessLatLng, cities[state.cityNum].latlng], { color: "green" }).addTo(map);
+    }
+
     map.fitBounds(polyline.getBounds().pad(0.2));
 }
 
@@ -200,7 +220,7 @@ function newRound() {
 
     // reset states
     state.cityNum += 1;
-    state.numOfGuesses = 0;
+    state.distGuesses = [];
     state.currGuessLatLng = null;
 
     // reset game UI
