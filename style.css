@@ -125,11 +125,14 @@ header {
     align-content: center;
 }
 
-#score {
+.bottom-text {
     font-size: 15px;
     font-weight: bold;
     text-align: center;
     margin-top: 20px;
 }
 
-
+#end-msg {
+    display: none;
+    font-size: 20px;
+}

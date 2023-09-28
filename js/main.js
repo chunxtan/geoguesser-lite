@@ -30,6 +30,7 @@ const guessDist = document.querySelectorAll('.guessDist');
 const guessWarning = document.getElementById('guess-warning');
 const distAns = document.getElementById('dist-ans');
 const score = document.getElementById('score');
+const endMsg = document.getElementById('end-msg');
 
  /*----- event listeners -----*/
 startBtn.addEventListener('click', initialise);
@@ -153,6 +154,8 @@ function checkGuess() {
             showAns(true, null);
 
             calcScore(dist);
+
+            checkEndGame();
         } else {
             guessNum[currGuesses - 1].innerHTML = currGuesses;
             guessDist[currGuesses - 1].innerHTML = `${dist.toFixed(2)} km`;
@@ -175,15 +178,29 @@ function checkGuess() {
 
             confirmBtn.style.display = "none";
             nextBtn.style.display = "block";
+
+            checkEndGame();
         }
 
-        // TO-DO: if the user has completed all rounds
     } else {
         // if user clicks confirm guess without making a guess
         guessWarning.innerHTML = "Please make a guess first!";
         setTimeout(() => {
             guessWarning.innerHTML = null;
         }, 3000)
+    }
+}
+
+// to check if the user has completed all rounds
+function checkEndGame() {
+    if (state.cityNum+1 === numOfRounds) {
+
+        console.log("end:", state.cityNum+1);
+        nextBtn.style.display = "none";
+        gameStatsContainer.style.display = "none";
+        endMsg.style.display = "block";
+
+        endMsg.innerHTML = `Nice! Your total score is ${state.score}!`
     }
 }
 
