@@ -12,7 +12,7 @@ let map;
 let guessMarker;
 let ansMarker;
 let polyline;
-let cities = [];
+let cities;
 
  /*----- cached elements  -----*/
 const welcomeMsg = document.getElementById('welcome-msg');
@@ -31,22 +31,31 @@ const guessWarning = document.getElementById('guess-warning');
 const distAns = document.getElementById('dist-ans');
 const score = document.getElementById('score');
 const endMsg = document.getElementById('end-msg');
+const restartBtn = document.getElementById('restart-btn');
 
  /*----- event listeners -----*/
-startBtn.addEventListener('click', initialise);
+startBtn.addEventListener('click', startGame);
 confirmBtn.addEventListener('click', checkGuess);
 nextBtn.addEventListener('click', newRound);
+restartBtn.addEventListener('click', restartGame);
 
  /*----- functions -----*/
-function initialise() {
+function startGame() {
+    initialiseStates();
+    getCities();
+    renderStart();
+}
+
+// to initialise/restart game states
+function initialiseStates() {
     state = {
         score: 0,
         cityNum: 0,
         distGuesses: [],
         currGuessLatLng: null
     }
-    getCities();
-    renderStart();
+
+    cities = [];
 }
 
 // to render initial state of game UI
@@ -146,7 +155,12 @@ function checkGuess() {
             latlng: state.currGuessLatLng,
             distance: dist
         });
+
+        // to keep track of guess # for this round
         const currGuesses = state.distGuesses.length;
+        
+        guessNum[currGuesses - 1].innerHTML = currGuesses;
+        guessDist[currGuesses - 1].innerHTML = `${dist.toFixed(2)} km`;
 
         // if guess is within winDist,
         if (dist <= winDist) {
@@ -155,15 +169,15 @@ function checkGuess() {
 
             calcScore(dist);
 
+            confirmBtn.style.display = "none";
+            nextBtn.style.display = "block";
+
             checkEndGame();
-        } else {
-            guessNum[currGuesses - 1].innerHTML = currGuesses;
-            guessDist[currGuesses - 1].innerHTML = `${dist.toFixed(2)} km`;
-        }
+        } 
 
         // if all guesses have been used up before a correct guess
         // render result UI
-        if (currGuesses === numOfGuesses) {
+        if (currGuesses === numOfGuesses && dist > winDist) {
             const shortestDistGuess = state.distGuesses.sort((a, b) => (a.distance-b.distance))[0];
             const shortestDist = shortestDistGuess.distance;
             distAns.innerHTML = `Your closest guess was ${shortestDist.toFixed(2)} km away!`
@@ -199,6 +213,7 @@ function checkEndGame() {
         nextBtn.style.display = "none";
         gameStatsContainer.style.display = "none";
         endMsg.style.display = "block";
+        restartBtn.style.display = "block";
 
         endMsg.innerHTML = `Nice! Your total score is ${state.score}!`
     }
@@ -230,10 +245,7 @@ function showAns(isGuessCorrect, shortestDistGuess) {
 
 // to set up next round
 function newRound() {
-    // remove all graphics from map
-    map.removeLayer(guessMarker);
-    map.removeLayer(ansMarker);
-    map.removeLayer(polyline);
+    removeMapGraphics();
 
     // reset states
     state.cityNum += 1;
@@ -244,4 +256,22 @@ function newRound() {
     renderGame();
 }
 
+// remove all graphics from map
+function removeMapGraphics() {
+    map.removeLayer(guessMarker);
+    map.removeLayer(ansMarker);
+    map.removeLayer(polyline);
+}
 
+// to restart the game
+function restartGame() {
+    endMsg.style.display = "none";
+    restartBtn.style.display = "none";
+    gameStatsContainer.style.display = "block";
+    score.innerHTML = "Total Score: 0";
+
+    removeMapGraphics();
+    initialiseStates();
+    getCities();
+    renderGame();
+}

@@ -136,3 +136,8 @@ header {
     display: none;
     font-size: 20px;
 }
+
+#restart-btn {
+    display: none;
+    margin-top: 20px;
+}
