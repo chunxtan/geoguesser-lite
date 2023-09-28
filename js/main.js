@@ -6,6 +6,17 @@ const minDist = 3000;
 const numOfGuesses = 3;
 const numOfRounds = 5;
 
+const guessIcon = L.icon({
+    iconUrl: "./src/img/pin_blue.png",
+    iconSize: [40, 40],
+    iconAnchor: [20, 40]
+})
+const ansIcon = L.icon({
+    iconUrl: "./src/img/pin_green.png",
+    iconSize: [40, 40],
+    iconAnchor: [20, 40]
+})
+
  /*----- state variables -----*/
 let state;
 let map;
@@ -115,12 +126,10 @@ function handleClick(evt) {
         // check if marker exists before rendering new marker
         if (state.currGuessLatLng) {
             map.removeLayer(guessMarker);
-            guessMarker = new L.Marker(latlng);
-            map.addLayer(guessMarker);
+            guessMarker = new L.Marker(latlng, {icon: guessIcon}).addTo(map);
             state.currGuessLatLng = latlng;
         } else {
-            guessMarker = new L.Marker(latlng);
-            map.addLayer(guessMarker);
+            guessMarker = new L.Marker(latlng, {icon: guessIcon}).addTo(map);
             state.currGuessLatLng = latlng;
         }
 }
@@ -227,17 +236,16 @@ function calcScore(dist) {
 // to zoom into answer + guess bounds
 function showAns(isGuessCorrect, shortestDistGuess) {
     // TO-DO: style ansMarker to diff style
-    ansMarker = new L.Marker(cities[state.cityNum].latlng).addTo(map);
+    ansMarker = new L.Marker(cities[state.cityNum].latlng, {icon: ansIcon}).addTo(map);
 
     // if user did not manage to guess the city location
     if (!isGuessCorrect) {
         // render marker of guess with the shortest distance
         map.removeLayer(guessMarker);
-        guessMarker = new L.Marker(shortestDistGuess.latlng);
-        map.addLayer(guessMarker);
-        polyline = L.polyline([shortestDistGuess.latlng, cities[state.cityNum].latlng], { color: "green" }).addTo(map);
+        guessMarker = new L.Marker(shortestDistGuess.latlng, {icon: guessIcon}).addTo(map);
+        polyline = L.polyline([shortestDistGuess.latlng, cities[state.cityNum].latlng], { color: "green", dashArray: "6" }).addTo(map);
     } else {
-        polyline = L.polyline([state.currGuessLatLng, cities[state.cityNum].latlng], { color: "green" }).addTo(map);
+        polyline = L.polyline([state.currGuessLatLng, cities[state.cityNum].latlng], { color: "green", dashArray: "6" }).addTo(map);
     }
 
     map.fitBounds(polyline.getBounds().pad(0.2));
