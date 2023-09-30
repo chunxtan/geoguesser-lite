@@ -160,6 +160,15 @@ function getCities() {
 function checkGuess() {
     // check if user added marker to map
     if (newGuessMarker && map.hasLayer(newGuessMarker)) {
+        // check if guess is repeated
+        if (state.guessMarkers.includes(newGuessMarker)) {
+            guessWarning.innerHTML = "You've already guessed this!";
+            setTimeout(() => {
+                guessWarning.innerHTML = null;
+            }, 3000)
+            return;
+        }
+
         // to check how far player's guess is from answer
         const dist = (map.distance(state.currGuessLatLng, cities[state.cityNum].latlng))/1000;
         state.guessMarkers.push(newGuessMarker);
