@@ -20,10 +20,11 @@ const ansIcon = L.icon({
  /*----- state variables -----*/
 let state;
 let map;
-let guessMarker;
 let ansMarker;
 let polyline;
 let cities;
+
+let newGuessMarker;
 
  /*----- cached elements  -----*/
 const welcomeMsg = document.getElementById('welcome-msg');
@@ -64,7 +65,9 @@ function initialiseStates() {
         score: 0,
         cityNum: 0,
         distGuesses: [],
-        currGuessLatLng: null
+        guessMarkers: [],
+        currGuessLatLng: null,
+        lastMarkerConfirm: false
     }
 
     cities = [];
@@ -124,16 +127,14 @@ function renderGame() {
 function handleClick(evt) {
         // get click latlng
         const latlng = evt.latlng;
-        
-        // check if marker exists before rendering new marker
-        if (state.currGuessLatLng) {
-            map.removeLayer(guessMarker);
-            guessMarker = new L.Marker(latlng, {icon: guessIcon}).addTo(map);
-            state.currGuessLatLng = latlng;
-        } else {
-            guessMarker = new L.Marker(latlng, {icon: guessIcon}).addTo(map);
-            state.currGuessLatLng = latlng;
-        }
+
+        // check if marker of current guess exists before rendering new marker
+        if (newGuessMarker && !state.lastMarkerConfirm) {
+            map.removeLayer(newGuessMarker);
+        } 
+        newGuessMarker = new L.Marker(latlng, {icon: guessIcon}).addTo(map);
+        state.lastMarkerConfirm = false;
+        state.currGuessLatLng = latlng;
 }
 
 // to prepare list of cities for game
@@ -158,9 +159,11 @@ function getCities() {
 
 function checkGuess() {
     // check if user added marker to map
-    if (guessMarker && map.hasLayer(guessMarker)) {
+    if (newGuessMarker && map.hasLayer(newGuessMarker)) {
         // to check how far player's guess is from answer
         const dist = (map.distance(state.currGuessLatLng, cities[state.cityNum].latlng))/1000;
+        state.guessMarkers.push(newGuessMarker);
+        state.lastMarkerConfirm = true;
         state.distGuesses.push({
             guessNum: state.distGuesses.length,
             latlng: state.currGuessLatLng,
@@ -179,6 +182,8 @@ function checkGuess() {
         arrowImg.style.height = "100%";
         arrowImg.style.transform = `rotate(${direction}deg)`;
         guessDir[currGuesses - 1].appendChild(arrowImg);
+
+        state.guessMarkers.forEach((marker) => marker.addTo(map));
 
         // if guess is within winDist,
         if (dist <= winDist) {
@@ -227,7 +232,6 @@ function checkGuess() {
 function checkEndGame() {
     if (state.cityNum+1 === numOfRounds) {
 
-        console.log("end:", state.cityNum+1);
         nextBtn.style.display = "none";
         gameStatsContainer.style.display = "none";
         endMsg.style.display = "block";
@@ -248,9 +252,7 @@ function showAns(isGuessCorrect, shortestDistGuess) {
 
     // if user did not manage to guess the city location
     if (!isGuessCorrect) {
-        // render marker of guess with the shortest distance
-        map.removeLayer(guessMarker);
-        guessMarker = new L.Marker(shortestDistGuess.latlng, {icon: guessIcon}).addTo(map);
+        // render line to guess with the shortest distance
         polyline = L.polyline([shortestDistGuess.latlng, cities[state.cityNum].latlng], { color: "green", dashArray: "6" }).addTo(map);
     } else {
         // render marker of guess within winDist 
@@ -278,6 +280,7 @@ function newRound() {
     // reset states
     state.cityNum += 1;
     state.distGuesses = [];
+    state.guessMarkers = [];
     state.currGuessLatLng = null;
 
     // reset game UI
@@ -286,7 +289,7 @@ function newRound() {
 
 // remove all graphics from map
 function removeMapGraphics() {
-    map.removeLayer(guessMarker);
+    state.guessMarkers.forEach((marker) => map.removeLayer(marker));
     map.removeLayer(ansMarker);
     map.removeLayer(polyline);
 }
