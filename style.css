@@ -23,7 +23,7 @@ header {
     display: none;
 }
 
-#city-counter {
+.city-container-text {
     font-size: 15px;
     text-align: center;
     margin-top: 20px;
@@ -33,6 +33,10 @@ header {
     font-size: 50px;
     font-weight: bold;
     text-align: center;
+}
+
+#hint-btn {
+    display: none;
 }
 
 #map {

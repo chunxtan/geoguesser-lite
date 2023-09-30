@@ -33,6 +33,8 @@ const startBtn = document.getElementById('start-btn');
 const confirmBtn = document.getElementById('confirm-btn');
 const nextBtn = document.getElementById('next-btn');
 const gameStatsContainer = document.getElementById('game-stats-container'); 
+const hintBtn = document.getElementById('hint-btn');
+const countryName = document.getElementById('country-name');
 
 const cityCounter = document.getElementById('city-counter');
 const cityName = document.getElementById('city-name');
@@ -48,6 +50,7 @@ const restartBtn = document.getElementById('restart-btn');
 
  /*----- event listeners -----*/
 startBtn.addEventListener('click', startGame);
+hintBtn.addEventListener('click', giveHint);
 confirmBtn.addEventListener('click', checkGuess);
 nextBtn.addEventListener('click', newRound);
 restartBtn.addEventListener('click', restartGame);
@@ -83,7 +86,7 @@ function renderStart() {
 
     confirmBtn.innerHTML = "Confirm Guess";
 
-    const elToInitialise = [cityContainer, gameStatsContainer, confirmBtn];
+    const elToInitialise = [cityContainer, gameStatsContainer, confirmBtn, hintBtn];
     elToInitialise.forEach(el => {
         el.style.display = "block";
     })
@@ -118,6 +121,8 @@ function renderGame() {
     distAns.innerHTML = null;
     nextBtn.style.display = "none";
     confirmBtn.style.display = "block";
+    hintBtn.style.display = "block";
+    countryName.style.display = "none";
     guessNum.forEach(el => el.innerHTML = null);
     guessDist.forEach(el => el.innerHTML = null);
     guessDir.forEach(el => el.innerHTML = null);
@@ -314,4 +319,11 @@ function restartGame() {
     initialiseStates();
     getCities();
     renderGame();
+}
+
+function giveHint() {
+    hintBtn.style.display = "none";
+    console.log(cities[state.cityNum].country.toUpperCase());
+    countryName.style.display = "block";
+    countryName.innerHTML = cities[state.cityNum].country.toUpperCase();
 }
