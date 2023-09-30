@@ -37,6 +37,7 @@ const cityCounter = document.getElementById('city-counter');
 const cityName = document.getElementById('city-name');
 const guessNum = document.querySelectorAll('.guessNum');
 const guessDist = document.querySelectorAll('.guessDist');
+const guessDir = document.querySelectorAll('.guessDir');
 
 const guessWarning = document.getElementById('guess-warning');
 const distAns = document.getElementById('dist-ans');
@@ -116,6 +117,7 @@ function renderGame() {
     confirmBtn.style.display = "block";
     guessNum.forEach(el => el.innerHTML = null);
     guessDist.forEach(el => el.innerHTML = null);
+    guessDir.forEach(el => el.innerHTML = null);
 }
 
 // to handle user's click on map
@@ -170,6 +172,13 @@ function checkGuess() {
         
         guessNum[currGuesses - 1].innerHTML = currGuesses;
         guessDist[currGuesses - 1].innerHTML = `${dist.toFixed(2)} km`;
+        // get direction to city from guess
+        const direction = checkDirection(state.currGuessLatLng, cities[state.cityNum].latlng);
+        const arrowImg = document.createElement('img');
+        arrowImg.src = "./src/img/direction-arrow.png";
+        arrowImg.style.height = "100%";
+        arrowImg.style.transform = `rotate(${direction}deg)`;
+        guessDir[currGuesses - 1].appendChild(arrowImg);
 
         // if guess is within winDist,
         if (dist <= winDist) {
@@ -235,7 +244,6 @@ function calcScore(dist) {
 
 // to zoom into answer + guess bounds
 function showAns(isGuessCorrect, shortestDistGuess) {
-    // TO-DO: style ansMarker to diff style
     ansMarker = new L.Marker(cities[state.cityNum].latlng, {icon: ansIcon}).addTo(map);
 
     // if user did not manage to guess the city location
@@ -245,10 +253,22 @@ function showAns(isGuessCorrect, shortestDistGuess) {
         guessMarker = new L.Marker(shortestDistGuess.latlng, {icon: guessIcon}).addTo(map);
         polyline = L.polyline([shortestDistGuess.latlng, cities[state.cityNum].latlng], { color: "green", dashArray: "6" }).addTo(map);
     } else {
+        // render marker of guess within winDist 
         polyline = L.polyline([state.currGuessLatLng, cities[state.cityNum].latlng], { color: "green", dashArray: "6" }).addTo(map);
     }
 
     map.fitBounds(polyline.getBounds().pad(0.2));
+}
+
+function checkDirection(guessLatLng, ansLatLng) {
+    const latDiff = ansLatLng[0] - guessLatLng.lat;
+    const lngDiff = ansLatLng[1] - guessLatLng.lng;
+
+    let calc_angle = Math.atan2(lngDiff, latDiff);
+
+    const final_angle = calc_angle * 180 / Math.PI;
+
+    return final_angle;
 }
 
 // to set up next round
