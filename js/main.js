@@ -47,13 +47,15 @@ const distAns = document.getElementById('dist-ans');
 const score = document.getElementById('score');
 const endMsg = document.getElementById('end-msg');
 const restartBtn = document.getElementById('restart-btn');
-
+const shareBtn = document.getElementById('share-btn');
+const endRes = document.getElementById('end-res');
  /*----- event listeners -----*/
 startBtn.addEventListener('click', startGame);
 hintBtn.addEventListener('click', giveHint);
 confirmBtn.addEventListener('click', checkGuess);
 nextBtn.addEventListener('click', newRound);
 restartBtn.addEventListener('click', restartGame);
+shareBtn.addEventListener('click', shareRes);
 
  /*----- functions -----*/
 function startGame() {
@@ -250,6 +252,7 @@ function checkEndGame() {
         gameStatsContainer.style.display = "none";
         endMsg.style.display = "block";
         restartBtn.style.display = "block";
+        shareBtn.style.display = "block";
 
         endMsg.innerHTML = `Nice! Your total score is ${state.score}!`
     }
@@ -323,7 +326,20 @@ function restartGame() {
 
 function giveHint() {
     hintBtn.style.display = "none";
-    console.log(cities[state.cityNum].country.toUpperCase());
     countryName.style.display = "block";
     countryName.innerHTML = cities[state.cityNum].country.toUpperCase();
+}
+
+async function shareRes() {
+    navigator.clipboard.writeText(endMsg.innerHTML).then(
+        () => {
+            endRes.style.display = "block";
+            setTimeout(() => {
+                endRes.style.display = "none";
+            }, 3000)
+        },
+        () => {
+
+        }
+    );
 }
