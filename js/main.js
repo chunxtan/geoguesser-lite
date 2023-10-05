@@ -273,6 +273,7 @@ function calcScore(dist) {
 
 // to zoom into answer + guess bounds
 function showAns(isGuessCorrect, shortestDistGuess) {
+    giveHint();
     ansMarker = new L.Marker(cities[state.cityNum].latlng, {icon: ansIcon}).addTo(map);
 
     // if user did not manage to guess the city location
