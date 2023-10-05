@@ -348,7 +348,7 @@ async function shareRes() {
     })
     const scoreString = rowArr.join("\n");
 
-    const shareMsg = "geoguesser-lite" + "\n\n" + endMsg.innerHTML + "\n" + scoreString + "\n\n" + "https://github.com/chunxtan/geoguesser-lite";
+    const shareMsg = "geoguesser-lite" + "\n\n" + endMsg.innerHTML + "\n" + scoreString + "\n\n" + "https://chunxtan.github.io/geoguesser-lite/";
     navigator.clipboard.writeText(shareMsg).then(
         () => {
             endRes.style.display = "block";
