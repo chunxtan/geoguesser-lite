@@ -323,6 +323,7 @@ function removeMapGraphics() {
 function restartGame() {
     endMsg.style.display = "none";
     restartBtn.style.display = "none";
+    shareBtn.style.display = "none";
     gameStatsContainer.style.display = "block";
     score.innerHTML = "Total Score: 0";
 
