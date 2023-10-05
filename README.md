@@ -1,4 +1,4 @@
-# [geoguesser-lite](https://github.com/chunxtan/geoguesser-lite)
+# [geoguesser-lite](https://chunxtan.github.io/geoguesser-lite/)
 ## Overview
 Inspired by Geoguessr --- without the new jazzy new avatars & a subscription to pay for the Google Maps API, but with all the guesses you need! Geoguesser-lite is a game for map & city lovers or potentially an inspiration for your next holiday destination. 
 
