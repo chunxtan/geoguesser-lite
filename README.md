@@ -1,10 +1,11 @@
-# geoguesser-lite
+# [geoguesser-lite](https://github.com/chunxtan/geoguesser-lite)
 ## Overview
 Inspired by Geoguessr --- without the new jazzy new avatars & a subscription to pay for the Google Maps API, but with all the guesses you need! Geoguesser-lite is a game for map & city lovers or potentially an inspiration for your next holiday destination. 
 
+### Getting Started
 * 5 rounds of randomised cities, 3 guesses each
 * Click anywhere on the map where you think the city is
-* Guess within 3000km of the answer to score some points & within 100km to get an instant win
+* Guess within 3000km of the answer to score some points & within 100km to get an instant win for each round
 * Country hint available for each round
 Guess away!
 
