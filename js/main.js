@@ -72,7 +72,8 @@ function initialiseStates() {
         distGuesses: [],
         guessMarkers: [],
         currGuessLatLng: null,
-        lastMarkerConfirm: false
+        lastMarkerConfirm: false,
+        scoreCard: [[],[],[],[],[]]
     }
 
     cities = [];
@@ -212,7 +213,14 @@ function checkGuess() {
             nextBtn.style.display = "block";
 
             checkEndGame();
-        } 
+
+            // add to scoreCard
+            state.scoreCard[`${state.cityNum}`][currGuesses-1] = "🟩";
+        } else if (dist <= minDist) {
+            state.scoreCard[`${state.cityNum}`][currGuesses-1] = "🟨";
+        } else {
+            state.scoreCard[`${state.cityNum}`][currGuesses-1] = "⬜";
+        }
 
         // if all guesses have been used up before a correct guess
         // render result UI
@@ -331,7 +339,15 @@ function giveHint() {
 }
 
 async function shareRes() {
-    navigator.clipboard.writeText(endMsg.innerHTML).then(
+    let rowArr = [];
+    state.scoreCard.forEach((round) => {
+        let row = round.join("");
+        rowArr.push(row);
+    })
+    const scoreString = rowArr.join("\n");
+
+    const shareMsg = "geoguesser-lite" + "\n\n" + endMsg.innerHTML + "\n" + scoreString + "\n\n" + "https://github.com/chunxtan/geoguesser-lite";
+    navigator.clipboard.writeText(shareMsg).then(
         () => {
             endRes.style.display = "block";
             setTimeout(() => {
