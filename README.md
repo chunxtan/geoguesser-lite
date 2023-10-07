@@ -40,6 +40,49 @@ https://leafletjs.com/
 * Option for user to choose continent/country/region to play
 * Option to reveal direction to city from current guess
 
+## Favourites
+### 😄 #1 Rendering the Answer Marker & Distance to nearest guess
+This function renders the answer marker & a dotted polyline between the guess made and answer marker. 
+It is called with each guess being confirmed. This function takes in two arguments:
+* `isGuessCorrect` is a boolean value. To check if the guess made was an immediate win or not.
+* `shortestDistGuess` takes in an object | null. The object has properties of `guessNum` (number of guesses made for this round), `latlng` (coordinates of guess) & 'distance' (distance from answer).
+
+```Javascript
+// to zoom into answer + guess bounds
+function showAns(isGuessCorrect, shortestDistGuess) {
+    giveHint();
+    ansMarker = new L.Marker(cities[state.cityNum].latlng, {icon: ansIcon}).addTo(map);
+
+    // if user did not manage to guess the city location
+    if (!isGuessCorrect) {
+        // render line to guess with the shortest distance
+        polyline = L.polyline([shortestDistGuess.latlng, cities[state.cityNum].latlng], { color: "green", dashArray: "6" }).addTo(map);
+    } else {
+        // render marker of guess within winDist 
+        polyline = L.polyline([state.currGuessLatLng, cities[state.cityNum].latlng], { color: "green", dashArray: "6" }).addTo(map);
+    }
+
+    map.fitBounds(polyline.getBounds().pad(0.2));
+}
+```
+### 😄 #2 Rendering direction of answer relative to current guess
+Use a single north-facing arrow and rotate it rather than using multiple arrow images pointing to different directions + switch cases.
+```Javascript
+function checkDirection(guessLatLng, ansLatLng) {
+    const latDiff = ansLatLng[0] - guessLatLng.lat;
+    const lngDiff = ansLatLng[1] - guessLatLng.lng;
+
+    let calc_angle = Math.atan2(lngDiff, latDiff);
+
+    const final_angle = calc_angle * 180 / Math.PI;
+
+    return final_angle;
+}
+```
+
+## Challenges
+* Finding an appropriate basemap without labels. Tried to venture into styling using WebGL but turned out to be a rabbithole!
+
 ## Attributions
 <a href="https://www.flaticon.com/free-icons/pin" title="pin icons">Pin icons created by Those Icons - Flaticon</a>
 <br>
